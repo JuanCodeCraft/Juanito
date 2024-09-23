@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+import { getDocs, collection, getFirestore } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDMolsjFUtisMQK21heoXNrB-OyZb2JyGg",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
+const db = getFirestore(app);
 
 auth.onAuthStateChanged((user) => {
   if (!user) {
@@ -116,3 +118,20 @@ function displayUploadedFiles() {
 }
 
 window.onload = displayUploadedFiles;
+
+
+const downloadbtn = document.getElementById('downloadbtnfile');
+if (downloadbtn) {
+    downloadbtn.addEventListener('click', async function() {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        const users = querySnapshot.docs.map(doc => ({
+            ...doc.data()
+        }));
+        const filename = 'Email.xlsx';
+        const worksheet = XLSX.utils.json_to_sheet(users);
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Emails');
+        XLSX.writeFile(workbook, filename);
+    });
+}

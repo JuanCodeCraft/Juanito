@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { setDoc, getFirestore, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDMolsjFUtisMQK21heoXNrB-OyZb2JyGg",
@@ -12,14 +13,25 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-document.getElementById('submit').addEventListener("click", (event) => {
+
+document.getElementById('submit').addEventListener("click", async (event) => {
   event.preventDefault();
 
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const emailError = document.getElementById('email-error');
   const passwordError = document.getElementById('password-error');
+
+  try {
+    await setDoc(doc(db, 'users', email),{
+      Email: email
+    }
+  );
+  } catch (error){
+    console.log(error)
+  };
 
   emailError.textContent = '';
   passwordError.textContent = '';
